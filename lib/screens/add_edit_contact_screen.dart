@@ -276,11 +276,11 @@ class _AddEditContactScreenState extends State<AddEditContactScreen> {
               const SizedBox(height: 20),
 
               // Favorite Switch
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
+              Material(
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.borderColor),
+                  side: const BorderSide(color: AppTheme.borderColor),
                 ),
                 child: SwitchListTile(
                   title: const Text(
