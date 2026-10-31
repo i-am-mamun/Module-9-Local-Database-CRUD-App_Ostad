@@ -259,12 +259,10 @@ class _AddEditContactScreenState extends State<AddEditContactScreen> {
               TextFormField(
                 controller: _addressController,
                 textCapitalization: TextCapitalization.sentences,
-                maxLines: 3,
                 decoration: const InputDecoration(
                   labelText: 'Address *',
-                  hintText: 'Enter physical or postal address',
+                  hintText: 'e.g. Road 12, Banani, Dhaka',
                   prefixIcon: Icon(Icons.location_on_outlined),
-                  alignLabelWithHint: true,
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
