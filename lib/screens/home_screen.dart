@@ -44,39 +44,54 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadContacts() async {
     setState(() => _isLoading = true);
 
-    final all = await DatabaseHelper.instance.getAllContacts();
-    final favs = await DatabaseHelper.instance.getFavoriteContacts();
+    try {
+      final all = await DatabaseHelper.instance.getAllContacts();
+      final favs = await DatabaseHelper.instance.getFavoriteContacts();
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    _totalCount = all.length;
-    _favoritesCount = favs.length;
+      _totalCount = all.length;
+      _favoritesCount = favs.length;
 
-    await _filterContacts();
+      await _filterContacts();
+    } catch (e) {
+      debugPrint('Error loading contacts: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   Future<void> _filterContacts() async {
-    final query = _searchController.text.trim();
-    List<Contact> result;
+    try {
+      final query = _searchController.text.trim();
+      List<Contact> result;
 
-    if (query.isEmpty) {
-      if (_showFavoritesOnly) {
-        result = await DatabaseHelper.instance.getFavoriteContacts();
+      if (query.isEmpty) {
+        if (_showFavoritesOnly) {
+          result = await DatabaseHelper.instance.getFavoriteContacts();
+        } else {
+          result = await DatabaseHelper.instance.getAllContacts();
+        }
       } else {
-        result = await DatabaseHelper.instance.getAllContacts();
+        result = await DatabaseHelper.instance.searchContacts(
+          query,
+          favoritesOnly: _showFavoritesOnly,
+        );
       }
-    } else {
-      result = await DatabaseHelper.instance.searchContacts(
-        query,
-        favoritesOnly: _showFavoritesOnly,
-      );
-    }
 
-    if (!mounted) return;
-    setState(() {
-      _contacts = result;
-      _isLoading = false;
-    });
+      if (!mounted) return;
+      setState(() {
+        _contacts = result;
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Error filtering contacts: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   Future<void> _toggleFavorite(Contact contact) async {
@@ -307,3 +322,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
