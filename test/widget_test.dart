@@ -1,30 +1,69 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:contact_app/main.dart';
+import 'package:contact_app/models/contact.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('Contact Model Tests', () {
+    test('toMap converts Contact instance into valid SQLite map', () {
+      final contact = Contact(
+        id: 1,
+        name: 'John Doe',
+        phone: '+1 234 567 8900',
+        email: 'john@example.com',
+        address: '123 Tech Street, Silicon Valley',
+        isFavorite: true,
+      );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+      final map = contact.toMap();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+      expect(map['id'], 1);
+      expect(map['name'], 'John Doe');
+      expect(map['phone'], '+1 234 567 8900');
+      expect(map['email'], 'john@example.com');
+      expect(map['address'], '123 Tech Street, Silicon Valley');
+      expect(map['is_favorite'], 1);
+    });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    test('fromMap restores Contact instance correctly', () {
+      final map = <String, dynamic>{
+        'id': 42,
+        'name': 'Jane Smith',
+        'phone': '+880 1700 000000',
+        'email': 'jane@example.com',
+        'address': 'Dhaka, Bangladesh',
+        'is_favorite': 1,
+      };
+
+      final contact = Contact.fromMap(map);
+
+      expect(contact.id, 42);
+      expect(contact.name, 'Jane Smith');
+      expect(contact.phone, '+880 1700 000000');
+      expect(contact.email, 'jane@example.com');
+      expect(contact.address, 'Dhaka, Bangladesh');
+      expect(contact.isFavorite, isTrue);
+    });
+
+    test('copyWith updates specified fields only', () {
+      final original = Contact(
+        id: 5,
+        name: 'Alice',
+        phone: '111',
+        email: 'alice@example.com',
+        address: 'Wonderland',
+        isFavorite: false,
+      );
+
+      final updated = original.copyWith(
+        name: 'Alice Cooper',
+        isFavorite: true,
+      );
+
+      expect(updated.id, original.id);
+      expect(updated.name, 'Alice Cooper');
+      expect(updated.phone, original.phone);
+      expect(updated.email, original.email);
+      expect(updated.address, original.address);
+      expect(updated.isFavorite, isTrue);
+    });
   });
 }
